@@ -5,13 +5,13 @@ Pontificia Universidad Javeriana · 2026
 
 [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/vuxk/uci-sepsis-mortality-ml/blob/main/sepsis-mortality-interpretable-model.ipynb)
 
-> ⚠️ **Datos:** MIMIC-IV requiere credenciales en PhysioNet. Ver `data/README.md`.
+ **Datos:** MIMIC-IV requiere credenciales en PhysioNet. Ver `data/README.md`.
 
 **SEED = 42 | Umbral óptimo siempre buscado en validación, evaluado en test**
 
 ## Descripción
 
-Este repositorio contiene el código del **Objetivo 2** de la tesis de grado, que desarrolla y evalúa modelos de aprendizaje supervisado para la predicción de mortalidad hospitalaria en pacientes de UCI, utilizando la base de datos clínica **MIMIC-IV**.
+Este repositorio contiene el código del **sepsis-mortality-interpretable-model.ipynb** de la tesis de grado, que desarrolla y evalúa modelos de aprendizaje supervisado para la predicción de mortalidad hospitalaria en pacientes de UCI, utilizando la base de datos clínica **MIMIC-IV**.
 
 El pipeline compara seis algoritmos de machine learning contra los scores clínicos estándar SOFA y APACHE II, aplica cuatro estrategias de balanceo de clases, e incorpora análisis de interpretabilidad local y global mediante SHAP y LIME.
 
@@ -86,8 +86,6 @@ El pipeline compara seis algoritmos de machine learning contra los scores clíni
 | **SHAP global** | TreeExplainer · beeswarm plot · barplot importancia media |
 | **SHAP local 2×2** | Waterfall plots para 4 casos: TP · TN · FN · FP |
 | **LIME local 2×2** | Contribuciones locales para los mismos 4 casos |
-| **Estabilidad LIME** | 10 corridas independientes sobre caso FN · heatmap de variabilidad |
-| **Concordancia** | SHAP vs LIME · top-5 variables por caso · robustez alta/media/baja |
 | **SHAP vs scores** | Ranking SHAP frente a variables de SOFA y APACHE II |
 
 ---
@@ -202,15 +200,6 @@ Este trabajo forma parte de una tesis que analiza la predicción de mortalidad e
 - **Objetivo 3:** Validación clínica y análisis de subgrupos
 
 Los scores clínicos SOFA y APACHE II se usan como **comparadores de referencia**, evaluados bajo el mismo esquema metodológico que los modelos ML (umbral óptimo en validación, evaluación en test, IC95% bootstrap).
-
----
-
-## Referencia de datos
-
-> Johnson, A., Bulgarelli, L., Shen, L., et al. (2023).
-> **MIMIC-IV, a freely accessible electronic health record dataset.**
-> *Scientific Data*, 10, 1.
-> [https://doi.org/10.1038/s41597-022-01899-x](https://doi.org/10.1038/s41597-022-01899-x)
 
 ---
 
