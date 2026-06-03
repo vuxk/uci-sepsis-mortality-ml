@@ -1,0 +1,105 @@
+# Anexo A. Construcción del cohorte de pacientes con Sepsis-3 en MIMIC-IV
+
+## Objetivo
+
+Construir un cohorte de pacientes adultos con sepsis utilizando la base de datos MIMIC-IV y los criterios Sepsis-3 previamente implementados en las tablas derivadas de MIMIC-IV.
+
+## Criterios de inclusión
+
+1. Pacientes que cumplen los criterios Sepsis-3.
+2. Edad mayor o igual a 18 años.
+3. Primera estancia en la Unidad de Cuidados Intensivos (UCI).
+
+## Obtención de la primera estancia en UCI
+
+```sql
+WITH first_icu AS (
+    SELECT
+        subject_id,
+        stay_id,
+        intime,
+        ROW_NUMBER() OVER (
+            PARTITION BY subject_id
+            ORDER BY intime
+        ) AS rn
+    FROM mimiciv_icu.icustays
+)
+
+SELECT *
+FROM first_icu
+WHERE rn = 1;
+```
+
+La consulta anterior identifica la primera estancia en UCI para cada paciente utilizando la fecha de ingreso a la unidad de cuidados intensivos.
+
+## Selección de pacientes adultos
+
+```sql
+SELECT
+    subject_id,
+    anchor_age
+FROM mimiciv_hosp.patients
+WHERE anchor_age >= 18;
+```
+
+Esta consulta filtra únicamente los pacientes adultos.
+
+## Construcción del cohorte final
+
+```sql
+WITH first_icu AS (
+    SELECT
+        subject_id,
+        stay_id,
+        intime,
+        ROW_NUMBER() OVER (
+            PARTITION BY subject_id
+            ORDER BY intime
+        ) AS rn
+    FROM mimiciv_icu.icustays
+),
+
+adults AS (
+    SELECT
+        subject_id
+    FROM mimiciv_hosp.patients
+    WHERE anchor_age >= 18
+)
+
+SELECT
+    s.subject_id,
+    s.hadm_id,
+    s.stay_id,
+    s.sepsis3,
+    s.suspected_infection_time,
+    s.sofa_time
+FROM mimiciv_derived.sepsis3 s
+INNER JOIN adults a
+    ON s.subject_id = a.subject_id
+INNER JOIN first_icu f
+    ON s.stay_id = f.stay_id
+WHERE f.rn = 1;
+```
+
+## Descripción del flujo de selección
+
+1. Identificación de pacientes con Sepsis-3.
+2. Exclusión de pacientes menores de 18 años.
+3. Selección de la primera estancia en UCI por paciente.
+4. Obtención del cohorte final para el desarrollo y validación de modelos predictivos.
+
+## Diagrama de selección del cohorte
+
+Pacientes con Sepsis-3
+
+↓
+
+Edad ≥ 18 años
+
+↓
+
+Primera estancia en UCI
+
+↓
+
+Cohorte final
